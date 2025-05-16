@@ -1,52 +1,48 @@
 "use client";
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import { useChatStore } from "../lib/store";
 import plugins from "../plugins";
+import { createMessage, parseToCommand } from "../lib/utils";
 
 export default function MessageInput({ setTyping }) {
   const [text, setText] = useState("");
   const addMessage = useChatStore((state) => state.addMessage);
 
   const handleSubmit = async () => {
-    const trimmed = text.trim();
-    if (!trimmed) return;
+    const rawInput = text.trim();
+    if (!rawInput) return;
 
-    const userMessage = {
-      id: uuidv4(),
+    const parsedInput = parseToCommand(rawInput);
+
+    const userMessage = createMessage({
       sender: "user",
-      content: trimmed,
-      type: "text",
-      timestamp: new Date().toISOString(),
-    };
-
+      content: rawInput,
+    });
     addMessage(userMessage);
     setText("");
 
-    const matchedPlugin = plugins.find((plugin) => plugin.match(trimmed));
+    const matchedPlugin = plugins.find((plugin) => plugin.match(parsedInput));
 
     if (matchedPlugin) {
       setTyping(true);
       try {
-        const pluginData = await matchedPlugin.execute(trimmed);
-        addMessage({
-          id: uuidv4(),
+        const pluginData = await matchedPlugin.execute(parsedInput);
+        const pluginMessage = createMessage({
           sender: "assistant",
           content: "",
           type: "plugin",
           pluginName: matchedPlugin.name,
           pluginData,
-          timestamp: new Date().toISOString(),
         });
-      } catch (err) {
-        addMessage({
-          id: uuidv4(),
-          sender: "assistant",
-          content: "⚠️ Failed to run plugin.",
-          type: "text",
-          timestamp: new Date().toISOString(),
-        });
-      }
+        addMessage(pluginMessage);
+    } catch (err) {
+  const errorMessage = createMessage({
+    sender: "assistant",
+    content: `⚠️ ${err.message || String(err)}`,
+  });
+  addMessage(errorMessage);
+}
+
       setTyping(false);
     }
   };
@@ -60,26 +56,26 @@ export default function MessageInput({ setTyping }) {
 
   return (
     <>
-   <div className="relative flex items-center bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-300 dark:border-gray-700 focus-within:ring-2 ring-primary transition">
-  <textarea
-    value={text}
-    onChange={(e) => setText(e.target.value)}
-    onKeyDown={handleKeyDown}
-    placeholder="Ask something or try /define love"
-    rows={1}
-    className="flex-1 resize-none px-4 py-3 text-sm bg-transparent text-gray-900 dark:text-gray-100 focus:outline-none"
-  />
-  <button
-    onClick={handleSubmit}
-    className="bg-primary text-white px-4 py-2 rounded-r-lg hover:bg-primary/90 transition"
-  >
-    Send
-  </button>
-</div>
-<div className="text-xs text-gray-500 mt-2 dark:text-gray-400">
-  Try: <code>/weather Tokyo</code> or <code>/calc 99+1</code>
-</div>
-
-</>
+      <div className="relative flex items-center bg-white rounded-xl shadow-sm border border-gray-300 focus-within:ring-2 ring-blue-500 transition">
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Type a message or try /define love"
+          rows={1}
+          className="flex-1 resize-none px-4 py-3 text-sm text-gray-800 bg-transparent focus:outline-none placeholder-gray-400"
+        />
+        <button
+          onClick={handleSubmit}
+          className="bg-blue-600 text-white px-4 py-2 rounded-r-xl hover:bg-blue-700 transition font-medium"
+        >
+          Send
+        </button>
+      </div>
+      <div className="text-xs text-gray-400 mt-2 px-1">
+        Try: <code className="text-gray-600">/weather Tokyo</code> or{" "}
+        <code className="text-gray-600">/calc 99+1</code>
+      </div>
+    </>
   );
 }

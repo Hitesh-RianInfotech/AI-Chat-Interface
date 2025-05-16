@@ -9,7 +9,6 @@ export async function GET(req) {
     }
   
     try {
-      // Simple and unsafe — for demo only
       const result = Function(`"use strict"; return (${expression})`)();
   
       if (typeof result !== "number") {
