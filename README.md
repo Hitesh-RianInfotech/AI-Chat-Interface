@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🤖 AI Chat Interface with Plugin Tools
 
-## Getting Started
+This is a next.js project that provides a smart chat interface with plugin-style tools like `/calc`, `/define`, and `/weather`.
 
-First, run the development server:
+## 🛠️ Setup and Running Instructions
 
-```bash
+Follow these steps to run the project locally:
+
+**Clone the repository**
+git clone https://github.com/Hitesh-RianInfotech/AI-Chat-Interface.git
+cd ai-chat-interface
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 🧠 How It Works
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+1. **User Input:**  
+   The user types a message like `/calc 5 + 10`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Command Parsing:**  
+   The app extracts the command (`/calc`) and the remaining input (`5 + 10`).
 
-## Learn More
+3. **Plugin Registry Match:**  
+   The app looks up the command in `pluginRegistry.ts`, where all plugins are registered.
 
-To learn more about Next.js, take a look at the following resources:
+4. **Dynamic Import:**  
+   If the command exists, the matching plugin is dynamically imported using `Next.js dynamic()`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. **ToolCard Render:**  
+   The plugin is passed the user input as a prop and rendered as a tool card in the chat window.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+### 📦 Plugin Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Each plugin is:
+- A React component inside the `/plugins` folder
+- Responsible for its own logic (API call, computation, etc.)
+- Rendered dynamically using Next.js
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 🧠 Plugins Implemented and APIs Used
+
+This chat app currently supports the following plugins:
+
+- **`/calc` (Calculator)**  
+  Lets users solve simple math expressions like `5 + 3 * 2`. It uses JavaScript’s `eval()` function to evaluate the result.
+
+- **`/define` (Dictionary)**  
+  Provides definitions for English words. For example, typing `/define innovation` fetches the meaning of "innovation". This plugin uses the [Free Dictionary API](https://dictionaryapi.dev/).
+
+- **`/weather` (Weather Info)**  
+  Shows current weather information for a given city. Typing `/weather London` will return temperature, humidity, etc., using the [OpenWeather API](https://openweathermap.org/api).
