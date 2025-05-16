@@ -7,10 +7,10 @@ This is a next.js project that provides a smart chat interface with plugin-style
 Follow these steps to run the project locally:
 
 **Clone the repository**
-git clone https://github.com/Hitesh-RianInfotech/AI-Chat-Interface.git
-cd ai-chat-interface
-npm install
-npm run dev
+- git clone https://github.com/Hitesh-RianInfotech/AI-Chat-Interface.git
+- cd ai-chat-interface
+- npm install
+- npm run dev
 
 ### 🧠 How It Works
 
